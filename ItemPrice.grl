@@ -1,0 +1,58 @@
+rule IsNotCashOrder "Is not Cash Order" {
+    when
+         RuleProcessor.Compare(Order.PaymentType, "cash") == false
+    then
+        Results.Result = false;
+        Results.AddError("Payment is not cash");
+    }
+
+rule IsNotZeroValueOrder "The order is for more than 0 in total" {
+    when
+         Order.Total <= 0
+    then
+        Results.Result = false;
+        Results.AddError("Total is incorrect (Zero or Lower)");
+    }
+
+rule ValidVendor "Check if vendor are valid" {
+    when
+          RuleProcessor.Compare(Order.Vendor.Status, "Open") == false
+    then
+        Results.Result = false;
+        Results.AddError("This vendor is unavailable(" + Order.Vendor.Status +")");
+    }
+
+rule ValidItemsCount "Check if items are valid" {
+    when
+         RuleProcessor.GetLength(Order.Items) < 10
+    then
+        Results.Result = false;
+        Results.AddError("Len < 10");
+    }
+
+rule ValidItems "Check if items are valid" {
+    when
+         RuleProcessor.GetLength(Order.Items) > 0
+    then
+        Results.ProcessJsonRules(Order.Items,
+            CatalogItems,
+            "{
+                \"matchingString\":\"ObjectA.Id == ObjectB.Id\",
+                \"comparisonString\":\"ObjectA.Name == ObjectB.Name\",
+                \"InternalChecks\":
+                [{
+                    \"ObjectA\":\"ItemChoices\",
+                    \"ObjectB\":\"ItemChoices\",
+                    \"MatchingString\":\"ObjectA.Id == ObjectB.Id\",
+                    \"ComparisonString\":\"ObjectA.Name == ObjectB.Name\"
+                }]
+            }");
+
+    }
+
+rule RuleProcessed "Just a check to flag the rule as processed" {
+    when
+         true == true
+    then
+        Results.ProcessRules();
+    }
