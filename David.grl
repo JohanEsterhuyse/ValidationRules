@@ -1,0 +1,14 @@
+rule IsNotCashOrder "Is not Cash Order" {
+    when
+         RuleProcessor.Compare(Order.Name, "David") == false
+    then
+        Results.Result = false;
+        Results.AddError("Here is Sasha's result");
+    }
+
+rule RuleProcessed "Just a check to flag the rule as processed" {
+    when
+         true == true
+    then
+        Results.ProcessRules();
+    }
