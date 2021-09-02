@@ -1,0 +1,23 @@
+rule Quantity "The order quantity should be above 0" {
+    when
+         SimpleOrder.Quantity <= 0
+    then
+        Results.Result = false;
+        Results.AddError("Quantity (Zero or Lower)");
+    }
+	
+rule IsNotZeroTotalOrder "The order needs to be more than 0 in total" {
+    when
+         SimpleOrder.Total <= 0
+    then
+        Results.Result = false;
+        Results.AddError("Total is incorrect (Zero or Lower)");
+    }
+
+
+rule RuleProcessed "Just a check to flag the rule as processed" {
+    when
+         true == true
+    then
+        Results.ProcessRules();
+    }
